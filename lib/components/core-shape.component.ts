@@ -30,8 +30,15 @@ declare const Konva: any;
 })
 export class CoreShapeComponent
   implements KonvaComponent, AfterContentInit, OnDestroy, OnInit {
-  @ContentChildren(CoreShapeComponent)
-  shapes = new QueryList<CoreShapeComponent>();
+  public shapes = new QueryList<CoreShape>();
+  @ContentChildren(CoreShape) set content(list: QueryList<CoreShape>) {
+    this.shapes = list;
+
+    this.shapes.forEach((item: CoreShape) => {
+      this._stage.add(item.getStage());
+      updatePicture(this._stage);
+    });
+  }
   @Input() config: Observable<any>;
   @Output() click: EventEmitter<any> = new EventEmitter();
   @Output() dblclick: EventEmitter<any> = new EventEmitter();
@@ -105,13 +112,6 @@ export class CoreShapeComponent
   }
 
   ngAfterContentInit() {
-    this.shapes.forEach((item: CoreShapeComponent) => {
-      if (this !== item) {
-        item.added = true;
-        this._stage.add(item.getStage());
-        updatePicture(this._stage);
-      }
-    });
   }
 
   ngOnDestroy() {
